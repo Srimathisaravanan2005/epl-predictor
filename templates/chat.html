@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+
+{% block title %}AI Chat - EPL Points Prediction{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="display-5 fw-bold text-primary">
+                <i class="fas fa-comments me-3"></i>AI Assistant
+            </h1>
+            <p class="lead text-muted">Chat with our Gen-AI powered assistant for EPL insights and analysis</p>
+        </div>
+    </div>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Chat Container -->
+            <div class="card shadow-lg border-0 chat-container">
+                <div class="card-header bg-gradient-primary text-white">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-3" 
+                             style="width: 40px; height: 40px;">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">EPL AI Assistant</h6>
+                            <small class="opacity-75">
+                                <i class="fas fa-circle text-success me-1" style="font-size: 8px;"></i>Online
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chat Messages -->
+                <div class="card-body p-0">
+                    <div id="chatMessages" class="chat-messages p-4" style="height: 500px; overflow-y: auto;">
+                        <!-- Welcome Message -->
+                        <div class="message bot-message mb-3">
+                            <div class="d-flex">
+                                <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                     style="width: 35px; height: 35px; min-width: 35px;">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div class="message-content">
+                                    <div class="message-bubble bg-light p-3 rounded">
+                                        <p class="mb-2">👋 Hello! I'm your EPL AI Assistant. I can help you with:</p>
+                                        <ul class="mb-2 small">
+                                            <li>Team statistics and performance analysis</li>
+                                            <li>Match predictions and insights</li>
+                                            <li>Historical data and trends</li>
+                                            <li>Player and team comparisons</li>
+                                        </ul>
+                                        <p class="mb-0 small text-muted">Ask me anything about the Premier League!</p>
+                                    </div>
+                                    <small class="text-muted">Just now</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chat Input -->
+                <div class="card-footer bg-light border-0">
+                    <form id="chatForm" class="d-flex gap-2">
+                        <input type="text" id="messageInput" class="form-control form-control-lg" 
+                               placeholder="Ask me about EPL teams, stats, or predictions..." 
+                               autocomplete="off" required>
+                        <button type="submit" class="btn btn-primary btn-lg px-4" id="sendButton">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Quick Questions -->
+            <div class="card shadow-sm border-0 mt-4">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>Quick Questions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-primary btn-sm w-100 quick-question" 
+                                    data-question="Which team has the best home record?">
+                                <i class="fas fa-home me-1"></i>Best home record?
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-success btn-sm w-100 quick-question" 
+                                    data-question="Who are the top scorers this season?">
+                                <i class="fas fa-futbol me-1"></i>Top scorers?
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-warning btn-sm w-100 quick-question" 
+                                    data-question="What's Arsenal's win rate?">
+                                <i class="fas fa-chart-line me-1"></i>Arsenal's win rate?
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-info btn-sm w-100 quick-question" 
+                                    data-question="Compare Liverpool vs Manchester City">
+                                <i class="fas fa-balance-scale me-1"></i>Compare teams
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-danger btn-sm w-100 quick-question" 
+                                    data-question="Which teams have the most red cards?">
+                                <i class="fas fa-exclamation-triangle me-1"></i>Most disciplined?
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-secondary btn-sm w-100 quick-question" 
+                                    data-question="Predict the next Manchester United match">
+                                <i class="fas fa-crystal-ball me-1"></i>Predict match
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat Tips -->
+            <div class="card shadow-sm border-0 mt-4">
+                <div class="card-body">
+                    <h6 class="fw-bold text-secondary mb-3">
+                        <i class="fas fa-info-circle me-2"></i>Chat Tips
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled small text-muted">
+                                <li><i class="fas fa-check text-success me-2"></i>Ask about specific teams</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Request match predictions</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Compare team statistics</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled small text-muted">
+                                <li><i class="fas fa-check text-success me-2"></i>Get historical insights</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Analyze performance trends</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Ask for explanations</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let isTyping = false;
+
+// Handle form submission
+document.getElementById('chatForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const messageInput = document.getElementById('messageInput');
+    const message = messageInput.value.trim();
+    
+    if (!message || isTyping) return;
+    
+    // Add user message
+    addMessage(message, 'user');
+    messageInput.value = '';
+    
+    // Show typing indicator
+    showTypingIndicator();
+    
+    try {
+        const response = await fetch('/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: message })
+        });
+        
+        const data = await response.json();
+        
+        // Remove typing indicator
+        hideTypingIndicator();
+        
+        if (data.error) {
+            addMessage(`Sorry, I encountered an error: ${data.error}`, 'bot');
+        } else {
+            addMessage(data.response, 'bot');
+        }
+    } catch (error) {
+        hideTypingIndicator();
+        addMessage('Sorry, I\'m having trouble connecting right now. Please try again.', 'bot');
+    }
+});
+
+// Handle quick questions
+document.querySelectorAll('.quick-question').forEach(button => {
+    button.addEventListener('click', function() {
+        const question = this.getAttribute('data-question');
+        document.getElementById('messageInput').value = question;
+        document.getElementById('chatForm').dispatchEvent(new Event('submit'));
+    });
+});
+
+function addMessage(text, sender) {
+    const chatMessages = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}-message mb-3`;
+    
+    const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    
+    if (sender === 'user') {
+        messageDiv.innerHTML = `
+            <div class="d-flex justify-content-end">
+                <div class="message-content me-3">
+                    <div class="message-bubble bg-primary text-white p-3 rounded">
+                        ${text}
+                    </div>
+                    <small class="text-muted d-block text-end">${timestamp}</small>
+                </div>
+                <div class="avatar bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                     style="width: 35px; height: 35px; min-width: 35px;">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        `;
+    } else {
+        messageDiv.innerHTML = `
+            <div class="d-flex">
+                <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                     style="width: 35px; height: 35px; min-width: 35px;">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-bubble bg-light p-3 rounded">
+                        ${text}
+                    </div>
+                    <small class="text-muted">${timestamp}</small>
+                </div>
+            </div>
+        `;
+    }
+    
+    chatMessages.appendChild(messageDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function showTypingIndicator() {
+    isTyping = true;
+    const chatMessages = document.getElementById('chatMessages');
+    const typingDiv = document.createElement('div');
+    typingDiv.id = 'typingIndicator';
+    typingDiv.className = 'message bot-message mb-3';
+    typingDiv.innerHTML = `
+        <div class="d-flex">
+            <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" 
+                 style="width: 35px; height: 35px; min-width: 35px;">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="message-content">
+                <div class="message-bubble bg-light p-3 rounded">
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    chatMessages.appendChild(typingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    document.getElementById('sendButton').disabled = true;
+}
+
+function hideTypingIndicator() {
+    isTyping = false;
+    const typingIndicator = document.getElementById('typingIndicator');
+    if (typingIndicator) {
+        typingIndicator.remove();
+    }
+    document.getElementById('sendButton').disabled = false;
+}
+
+// Auto-focus on input
+document.getElementById('messageInput').focus();
+</script>
+
+<style>
+.chat-container {
+    max-height: 700px;
+}
+
+.chat-messages {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.message-bubble {
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.user-message .message-bubble {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+}
+
+.typing-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.typing-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #6c757d;
+    animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+.typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing {
+    0%, 80%, 100% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.quick-question {
+    transition: all 0.2s ease;
+}
+
+.quick-question:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}

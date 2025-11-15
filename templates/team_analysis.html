@@ -1,0 +1,394 @@
+{% extends "base.html" %}
+
+{% block title %}Team Analysis - EPL Points Prediction{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-5 fw-bold text-primary">
+                <i class="fas fa-users me-3"></i>Team Analysis
+            </h1>
+            <p class="lead text-muted">Compare EPL teams head-to-head on various performance metrics</p>
+        </div>
+    </div>
+    
+    <!-- Team Selection -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-search me-2"></i>Select Teams to Compare
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-5">
+                            <label class="form-label fw-semibold">Team 1</label>
+                            <select name="team1" class="form-select form-select-lg" required>
+                                <option value="">Choose first team...</option>
+                                {% for team in teams %}
+                                <option value="{{ team }}" {% if request.args.get('team1') == team %}selected{% endif %}>
+                                    {{ team }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-2 text-center d-flex align-items-end">
+                            <div class="w-100">
+                                <div class="vs-badge bg-warning text-dark rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                     style="width: 60px; height: 60px;">
+                                    <strong>VS</strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-5">
+                            <label class="form-label fw-semibold">Team 2</label>
+                            <select name="team2" class="form-select form-select-lg" required>
+                                <option value="">Choose second team...</option>
+                                {% for team in teams %}
+                                <option value="{{ team }}" {% if request.args.get('team2') == team %}selected{% endif %}>
+                                    {{ team }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-12 text-center">
+                            <button type="submit" class="btn btn-primary btn-lg px-5">
+                                <i class="fas fa-chart-line me-2"></i>Compare Teams
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if comparison %}
+    <!-- Comparison Results -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-balance-scale me-2"></i>
+                        {{ comparison.team1.name }} vs {{ comparison.team2.name }}
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <!-- Team 1 -->
+                        <div class="col-md-5 p-4 bg-primary text-white">
+                            <div class="text-center mb-4">
+                                <h3 class="fw-bold">{{ comparison.team1.name }}</h3>
+                                <div class="team-badge bg-white text-primary rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                     style="width: 80px; height: 80px;">
+                                    <i class="fas fa-shield-alt fa-2x"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="stats-grid">
+                                <div class="stat-item mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Points</span>
+                                        <strong>{{ comparison.team1.stats.Points|round(0)|int }}</strong>
+                                    </div>
+                                </div>
+                                <div class="stat-item mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Matches</span>
+                                        <strong>{{ comparison.team1.stats.Matches|round(0)|int }}</strong>
+                                    </div>
+                                </div>
+                                <div class="stat-item mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Wins</span>
+                                        <strong>{{ comparison.team1.stats.Wins|round(0)|int }}</strong>
+                                    </div>
+                                </div>
+                                <div class="stat-item mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Goals For</span>
+                                        <strong>{{ comparison.team1.stats.GoalsFor|round(0)|int }}</strong>
+                                    </div>
+                                </div>
+                                <div class="stat-item mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Goals Against</span>
+                                        <strong>{{ comparison.team1.stats.GoalsAgainst|round(0)|int }}</strong>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Win %</span>
+                                        <strong>{{ comparison.team1.stats.WinPercentage|round(1) }}%</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- VS Section -->
+                        <div class="col-md-2 d-flex align-items-center justify-content-center bg-warning">
+                            <div class="text-center">
+                                <div class="vs-large bg-dark text-warning rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                                     style="width: 80px; height: 80px;">
+                                    <strong class="fs-4">VS</strong>
+                                </div>
+                                <div class="comparison-winner">
+                                    {% set team1_points = comparison.team1.stats.Points %}
+                                    {% set team2_points = comparison.team2.stats.Points %}
+                                    {% if team1_points > team2_points %}
+                                        <div class="badge bg-primary">{{ comparison.team1.name }} Leads</div>
+                                    {% elif team2_points > team1_points %}
+                                        <div class="badge bg-info">{{ comparison.team2.name }} Leads</div>
+                                    {% else %}
+                                        <div class="badge bg-secondary">Equal Points</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Team 2 -->
+                        <div class="col-md-5 p-4 bg-info text-white">
+                            <div class="text-center mb-4">
+                                <h3 class="fw-bold">{{ comparison.team2.name }}</h3>
+                                <div class="team-badge bg-white text-info rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                     style="width: 80px; height: 80px;">
+                                    <i class="fas fa-shield-alt fa-2x"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="stats-grid">
+                                <div class="stat-item mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Points</span>
+                                        <strong>{{ comparison.team2.stats.Points|round(0)|int }}</strong>
+                                    </div>
+                                </div>
+                                <div class="stat-item mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Matches</span>
+                                        <strong>{{ comparison.team2.stats.Matches|round(0)|int }}</strong>
+                                    </div>
+                                </div>
+                                <div class="stat-item mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Wins</span>
+                                        <strong>{{ comparison.team2.stats.Wins|round(0)|int }}</strong>
+                                    </div>
+                                </div>
+                                <div class="stat-item mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Goals For</span>
+                                        <strong>{{ comparison.team2.stats.GoalsFor|round(0)|int }}</strong>
+                                    </div>
+                                </div>
+                                <div class="stat-item mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Goals Against</span>
+                                        <strong>{{ comparison.team2.stats.GoalsAgainst|round(0)|int }}</strong>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Win %</span>
+                                        <strong>{{ comparison.team2.stats.WinPercentage|round(1) }}%</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Detailed Comparison Charts -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Performance Comparison
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="performanceChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-futbol me-2"></i>Goals Analysis
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="goalsChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Head-to-Head Prediction -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-magic me-2"></i>Head-to-Head Prediction
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <p class="lead mb-4">Based on current form and statistics</p>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="prediction-box p-3 border rounded">
+                                <h6 class="text-primary fw-bold">{{ comparison.team1.name }} Win</h6>
+                                <div class="display-6 fw-bold text-primary">
+                                    {% set team1_advantage = (comparison.team1.stats.WinPercentage / (comparison.team1.stats.WinPercentage + comparison.team2.stats.WinPercentage) * 100) %}
+                                    {{ team1_advantage|round(0)|int }}%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="prediction-box p-3 border rounded">
+                                <h6 class="text-warning fw-bold">Draw</h6>
+                                <div class="display-6 fw-bold text-warning">25%</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="prediction-box p-3 border rounded">
+                                <h6 class="text-info fw-bold">{{ comparison.team2.name }} Win</h6>
+                                <div class="display-6 fw-bold text-info">
+                                    {{ (100 - team1_advantage - 25)|round(0)|int }}%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-cogs me-2"></i>Detailed Match Prediction
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    // Performance Comparison Chart
+    const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+    new Chart(performanceCtx, {
+        type: 'radar',
+        data: {
+            labels: ['Points', 'Wins', 'Goals For', 'Win %', 'Goal Difference'],
+            datasets: [{
+                label: '{{ comparison.team1.name }}',
+                data: [
+                    {{ comparison.team1.stats.Points }},
+                    {{ comparison.team1.stats.Wins }},
+                    {{ comparison.team1.stats.GoalsFor }},
+                    {{ comparison.team1.stats.WinPercentage }},
+                    {{ comparison.team1.stats.GoalDifference }}
+                ],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 2
+            }, {
+                label: '{{ comparison.team2.name }}',
+                data: [
+                    {{ comparison.team2.stats.Points }},
+                    {{ comparison.team2.stats.Wins }},
+                    {{ comparison.team2.stats.GoalsFor }},
+                    {{ comparison.team2.stats.WinPercentage }},
+                    {{ comparison.team2.stats.GoalDifference }}
+                ],
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                r: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    
+    // Goals Analysis Chart
+    const goalsCtx = document.getElementById('goalsChart').getContext('2d');
+    new Chart(goalsCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Goals For', 'Goals Against'],
+            datasets: [{
+                label: '{{ comparison.team1.name }}',
+                data: [{{ comparison.team1.stats.GoalsFor }}, {{ comparison.team1.stats.GoalsAgainst }}],
+                backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }, {
+                label: '{{ comparison.team2.name }}',
+                data: [{{ comparison.team2.stats.GoalsFor }}, {{ comparison.team2.stats.GoalsAgainst }}],
+                backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    </script>
+    {% endif %}
+    
+    {% if not comparison and teams %}
+    <!-- Default State -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-users fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted">Select Two Teams to Compare</h4>
+                    <p class="text-muted">Choose teams from the dropdowns above to see detailed head-to-head analysis</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if not teams %}
+    <!-- No Data State -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-database fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted">No Team Data Available</h4>
+                    <p class="text-muted">Process the EPL data first to enable team analysis</p>
+                    <code>python src/1_data_loading.py</code>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

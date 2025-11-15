@@ -1,0 +1,13 @@
+{
+  "models_trained": [
+    "points_model",
+    "match_result_model",
+    "full_features_model"
+  ],
+  "training_date": "2025-11-07T22:07:23.227781",
+  "data_shape": [
+    3629,
+    30
+  ],
+  "team_count": 36
+}

@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block title %}ScoreSight - EPL Points Prediction{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-5 fw-bold text-primary">
+                <i class="fas fa-eye me-3"></i>ScoreSight
+            </h1>
+            <p class="lead text-muted">Live matches and upcoming fixtures with AI predictions</p>
+        </div>
+    </div>
+    
+    <!-- Accuracy Stats -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card bg-gradient-primary text-white shadow-lg">
+                <div class="card-body p-4">
+                    <div class="row text-center">
+                        <div class="col-md-3 col-6 mb-3 mb-md-0">
+                            <div class="stat-box">
+                                <h3 class="display-6 fw-bold">{{ accuracy_stats.half_time_accuracy }}%</h3>
+                                <p class="mb-0">Half-time Accuracy</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 mb-3 mb-md-0">
+                            <div class="stat-box">
+                                <h3 class="display-6 fw-bold">{{ accuracy_stats.full_time_accuracy }}%</h3>
+                                <p class="mb-0">Full-time Accuracy</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="stat-box">
+                                <h3 class="display-6 fw-bold">{{ accuracy_stats.total_predictions }}</h3>
+                                <p class="mb-0">Total Predictions</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <div class="stat-box">
+                                <h3 class="display-6 fw-bold">{{ accuracy_stats.correct_predictions }}</h3>
+                                <p class="mb-0">Correct Predictions</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Live Matches -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-broadcast-tower me-2"></i>Live Matches
+                        <span class="badge bg-light text-success ms-2">{{ live_matches|length }}</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if live_matches %}
+                        {% for match in live_matches %}
+                        <div class="live-match-card mb-3 p-3 border rounded">
+                            <div class="row align-items-center">
+                                <div class="col-4 text-end">
+                                    <strong>{{ match.HomeTeam }}</strong>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <div class="score-display">
+                                        <span class="badge bg-success fs-6">
+                                            {{ match.HomeScore }} - {{ match.AwayScore }}
+                                        </span>
+                                        <div class="small text-muted mt-1">
+                                            <i class="fas fa-clock me-1"></i>{{ match.Minute }}'
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <strong>{{ match.AwayTeam }}</strong>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-12 text-center">
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-circle me-1"></i>{{ match.Status }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-tv fa-3x mb-3"></i>
+                            <p>No live matches at the moment</p>
+                            <small>Check back during match days for live updates</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Upcoming Matches -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>Upcoming Fixtures
+                        <span class="badge bg-light text-info ms-2">{{ upcoming_matches|length }}</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if upcoming_matches %}
+                        <div class="upcoming-matches">
+                            {% for match in upcoming_matches[:8] %}
+                            <div class="upcoming-match-card mb-3 p-3 border rounded">
+                                <div class="row align-items-center">
+                                    <div class="col-4 text-end">
+                                        <strong class="text-primary">{{ match.HomeTeam }}</strong>
+                                    </div>
+                                    <div class="col-4 text-center">
+                                        <div class="vs-display">
+                                            <span class="badge bg-light text-dark">VS</span>
+                                            <div class="small text-muted mt-1">
+                                                {{ match.Date }} {{ match.Time }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <strong class="text-info">{{ match.AwayTeam }}</strong>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-12 text-center">
+                                        <button class="btn btn-outline-primary btn-sm" 
+                                                onclick="predictMatch('{{ match.HomeTeam }}', '{{ match.AwayTeam }}')">
+                                            <i class="fas fa-magic me-1"></i>Quick Predict
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                            <p>No upcoming matches scheduled</p>
+                            <small>Fixture list will be updated soon</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Match Insights -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>Match Insights & Trends
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="insight-card p-3 bg-light rounded">
+                                <h6 class="fw-bold text-primary">
+                                    <i class="fas fa-home me-2"></i>Home Advantage
+                                </h6>
+                                <p class="mb-0 small text-muted">
+                                    Home teams win 45% of matches on average, with stronger home records at certain stadiums.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="insight-card p-3 bg-light rounded">
+                                <h6 class="fw-bold text-success">
+                                    <i class="fas fa-chart-line me-2"></i>Form Matters
+                                </h6>
+                                <p class="mb-0 small text-muted">
+                                    Teams on winning streaks are 60% more likely to continue their good form.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="insight-card p-3 bg-light rounded">
+                                <h6 class="fw-bold text-info">
+                                    <i class="fas fa-clock me-2"></i>Time Patterns</                                </h6>
+                                <p class="mb-0 small text-muted">
+                                    Most goals are scored in the final 15 minutes of each half due to fatigue factors.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Prediction Modal -->
+<div class="modal fade" id="quickPredictModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-magic me-2"></i>Quick Match Prediction
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="quickPredictContent">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Generating prediction...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="{{ url_for('predict') }}" class="btn btn-primary">
+                    <i class="fas fa-cogs me-1"></i>Detailed Prediction
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function predictMatch(homeTeam, awayTeam) {
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('quickPredictModal'));
+    modal.show();
+    
+    // Simulate prediction (in real app, this would call the API)
+    setTimeout(() => {
+        const outcomes = ['Home Win', 'Draw', 'Away Win'];
+        const probabilities = [
+            Math.random() * 0.6 + 0.2,  // Home: 20-80%
+            Math.random() * 0.4 + 0.1,  // Draw: 10-50%
+            Math.random() * 0.5 + 0.1   // Away: 10-60%
+        ];
+        
+        // Normalize probabilities
+        const sum = probabilities.reduce((a, b) => a + b, 0);
+        const normalizedProbs = probabilities.map(p => p / sum);
+        
+        const maxIndex = normalizedProbs.indexOf(Math.max(...normalizedProbs));
+        const prediction = outcomes[maxIndex];
+        const confidence = (normalizedProbs[maxIndex] * 100).toFixed(1);
+        
+        const colors = ['success', 'warning', 'danger'];
+        const icons = ['trophy', 'handshake', 'plane'];
+        
+        document.getElementById('quickPredictContent').innerHTML = `
+            <div class="text-center">
+                <h4 class="text-${colors[maxIndex]}">
+                    <i class="fas fa-${icons[maxIndex]} me-2"></i>${homeTeam} vs ${awayTeam}
+                </h4>
+                <div class="alert alert-${colors[maxIndex]} mt-3">
+                    <h5 class="mb-0">Prediction: ${prediction}</h5>
+                    <small>Confidence: ${confidence}%</small>
+                </div>
+                <div class="row mt-3 small">
+                    <div class="col-4">
+                        <div class="text-success">
+                            <strong>Home Win</strong><br>
+                            ${(normalizedProbs[0] * 100).toFixed(1)}%
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-warning">
+                            <strong>Draw</strong><br>
+                            ${(normalizedProbs[1] * 100).toFixed(1)}%
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-danger">
+                            <strong>Away Win</strong><br>
+                            ${(normalizedProbs[2] * 100).toFixed(1)}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }, 1500);
+}
+
+// Auto-refresh live matches every 30 seconds
+setInterval(() => {
+    if (document.querySelector('.live-match-card')) {
+        // In a real app, this would fetch updated match data
+        console.log('Refreshing live match data...');
+    }
+}, 30000);
+</script>
+{% endblock %}

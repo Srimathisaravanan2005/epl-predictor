@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Login - EPL Points Prediction{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-md-6 col-lg-4">
+                <div class="card auth-card shadow-lg border-0">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-futbol fa-3x text-primary mb-3"></i>
+                            <h2 class="fw-bold text-primary">Welcome Back</h2>
+                            <p class="text-muted">Sign in to your EPL Predictor account</p>
+                        </div>
+                        
+                        <form method="POST">
+                            <div class="mb-3">
+                                <label for="username" class="form-label fw-semibold">
+                                    <i class="fas fa-user me-2"></i>Username
+                                </label>
+                                <input type="text" class="form-control form-control-lg" 
+                                       id="username" name="username" required
+                                       placeholder="Enter your username">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="password" class="form-label fw-semibold">
+                                    <i class="fas fa-lock me-2"></i>Password
+                                </label>
+                                <input type="password" class="form-control form-control-lg" 
+                                       id="password" name="password" required
+                                       placeholder="Enter your password">
+                            </div>
+                            
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <div class="text-center">
+                            <p class="text-muted mb-0">
+                                Don't have an account? 
+                                <a href="{{ url_for('register') }}" class="text-primary fw-semibold text-decoration-none">
+                                    Sign up here
+                                </a>
+                            </p>
+                        </div>
+                        
+                        <!-- Demo Credentials -->
+                        <div class="mt-4 p-3 bg-light rounded">
+                            <small class="text-muted">
+                                <strong>Demo:</strong> Use any username and password to login
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

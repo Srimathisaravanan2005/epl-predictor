@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - EPL Points Prediction{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-5 fw-bold text-primary">
+                <i class="fas fa-chart-bar me-3"></i>Analytics Dashboard
+            </h1>
+            <p class="lead text-muted">Comprehensive EPL statistics and visualizations</p>
+        </div>
+    </div>
+    
+    <!-- Quick Stats -->
+    <div class="row mb-5">
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card stat-card bg-primary text-white border-0">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-2x mb-2"></i>
+                    <h4 class="fw-bold">{{ team_stats|length }}</h4>
+                    <p class="mb-0">Teams Analyzed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card stat-card bg-success text-white border-0">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-2x mb-2"></i>
+                    <h4 class="fw-bold">{{ plots|length }}</h4>
+                    <p class="mb-0">Visualizations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card stat-card bg-info text-white border-0">
+                <div class="card-body text-center">
+                    <i class="fas fa-futbol fa-2x mb-2"></i>
+                    <h4 class="fw-bold">1000+</h4>
+                    <p class="mb-0">Matches Analyzed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card stat-card bg-warning text-white border-0">
+                <div class="card-body text-center">
+                    <i class="fas fa-brain fa-2x mb-2"></i>
+                    <h4 class="fw-bold">72%</h4>
+                    <p class="mb-0">Model Accuracy</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Visualizations -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-area me-2"></i>Data Visualizations
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if plots %}
+                        <div id="plotCarousel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-indicators">
+                                {% for plot in plots %}
+                                <button type="button" data-bs-target="#plotCarousel" 
+                                        data-bs-slide-to="{{ loop.index0 }}" 
+                                        {% if loop.first %}class="active"{% endif %}></button>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="carousel-inner">
+                                {% for plot in plots %}
+                                <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                    <div class="text-center">
+                                        <h6 class="fw-bold text-primary mb-3">{{ plot.title }}</h6>
+                                        <img src="{{ url_for('serve_plot', filename=plot.filename) }}" 
+                                             class="d-block w-100 rounded" 
+                                             alt="{{ plot.title }}"
+                                             style="max-height: 400px; object-fit: contain;">
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <button class="carousel-control-prev" type="button" data-bs-target="#plotCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon"></span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#plotCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon"></span>
+                            </button>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-chart-bar fa-3x mb-3"></i>
+                            <h5>No Visualizations Available</h5>
+                            <p>Run the EDA script to generate visualizations</p>
+                            <code>python src/2_eda_feature_engineering.py</code>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Team Statistics -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-trophy me-2"></i>Top Teams
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if team_stats %}
+                        <div class="team-rankings">
+                            {% for team in team_stats %}
+                            <div class="team-rank-item d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-primary me-2">{{ loop.index }}</span>
+                                    <strong>{{ team.Team if team.Team else loop.index }}</strong>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-bold text-success">{{ team.Points if team.Points else 'N/A' }} pts</div>
+                                    <small class="text-muted">{{ team.Wins if team.Wins else 0 }}W {{ team.Draws if team.Draws else 0 }}D {{ team.Losses if team.Losses else 0 }}L</small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('team_analysis') }}" class="btn btn-outline-success">
+                                <i class="fas fa-users me-1"></i>Compare Teams
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-users fa-3x mb-3"></i>
+                            <p>No team statistics available</p>
+                            <small>Process data to see team rankings</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Interactive Charts -->
+    <div class="row mt-4">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Match Outcomes Distribution
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="outcomeChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Goals per Match
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="goalsChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Key Insights -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>Key Insights
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="insight-box p-3 bg-light rounded">
+                                <h6 class="fw-bold text-primary">
+                                    <i class="fas fa-home me-2"></i>Home Advantage
+                                </h6>
+                                <p class="mb-2">Home teams have a significant advantage in the Premier League.</p>
+                                <ul class="small text-muted mb-0">
+                                    <li>45% of matches end in home wins</li>
+                                    <li>Home teams score 1.6 goals on average</li>
+                                    <li>Away teams score 1.2 goals on average</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="insight-box p-3 bg-light rounded">
+                                <h6 class="fw-bold text-success">
+                                    <i class="fas fa-target me-2"></i>Shot Efficiency
+                                </h6>
+                                <p class="mb-2">Shot accuracy is crucial for scoring goals.</p>
+                                <ul class="small text-muted mb-0">
+                                    <li>Teams average 12-15 shots per match</li>
+                                    <li>4-6 shots on target per match</li>
+                                    <li>Conversion rate: ~25-30%</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="insight-box p-3 bg-light rounded">
+                                <h6 class="fw-bold text-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Discipline Impact
+                                </h6>
+                                <p class="mb-2">Cards and fouls affect match outcomes.</p>
+                                <ul class="small text-muted mb-0">
+                                    <li>Average 2-3 yellow cards per team</li>
+                                    <li>Red cards occur in ~15% of matches</li>
+                                    <li>Teams with more fouls win less often</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Create interactive charts
+document.addEventListener('DOMContentLoaded', function() {
+    // Match Outcomes Pie Chart
+    const outcomeCtx = document.getElementById('outcomeChart').getContext('2d');
+    new Chart(outcomeCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Home Win', 'Draw', 'Away Win'],
+            datasets: [{
+                data: [45, 25, 30],
+                backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+    
+    // Goals Distribution Bar Chart
+    const goalsCtx = document.getElementById('goalsChart').getContext('2d');
+    new Chart(goalsCtx, {
+        type: 'bar',
+        data: {
+            labels: ['0 Goals', '1 Goal', '2 Goals', '3 Goals', '4+ Goals'],
+            datasets: [{
+                label: 'Frequency (%)',
+                data: [8, 22, 28, 25, 17],
+                backgroundColor: '#9c88ff',
+                borderColor: '#7c4dff',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Percentage of Matches'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

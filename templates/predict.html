@@ -1,0 +1,392 @@
+{% extends "base.html" %}
+
+{% block title %}AI Predictions - EPL Predictor{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="display-5 fw-bold text-primary">
+                <i class="fas fa-brain me-3"></i>AI Match Predictions
+            </h1>
+            <p class="lead text-muted">Advanced predictions with complete match statistics and pie chart visualization</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Input Form -->
+        <div class="col-lg-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-futbol me-2"></i>Match Prediction Setup</h5>
+                </div>
+                <div class="card-body">
+                    <form id="predictionForm">
+                        <!-- Team Selection -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Home Team</label>
+                                <select class="form-select" id="homeTeam" name="home_team" required>
+                                    <option value="">Select Home Team</option>
+                                    {% for team in teams %}
+                                    <option value="{{ team }}">{{ team }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Away Team</label>
+                                <select class="form-select" id="awayTeam" name="away_team" required>
+                                    <option value="">Select Away Team</option>
+                                    {% for team in teams %}
+                                    <option value="{{ team }}">{{ team }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Match Statistics -->
+                        <h6 class="text-success mb-3"><i class="fas fa-chart-bar me-2"></i>Match Statistics</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Home Shots</label>
+                                <input type="number" class="form-control" name="HS" min="0" max="50" value="12" placeholder="Total shots">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Away Shots</label>
+                                <input type="number" class="form-control" name="AS" min="0" max="50" value="8" placeholder="Total shots">
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Home Shots on Target</label>
+                                <input type="number" class="form-control" name="HST" min="0" max="20" value="5" placeholder="Shots on target">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Away Shots on Target</label>
+                                <input type="number" class="form-control" name="AST" min="0" max="20" value="3" placeholder="Shots on target">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Home Corners</label>
+                                <input type="number" class="form-control" name="HC" min="0" max="20" value="6" placeholder="Corner kicks">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Away Corners</label>
+                                <input type="number" class="form-control" name="AC" min="0" max="20" value="4" placeholder="Corner kicks">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Home Fouls</label>
+                                <input type="number" class="form-control" name="HF" min="0" max="30" value="12" placeholder="Fouls committed">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Away Fouls</label>
+                                <input type="number" class="form-control" name="AF" min="0" max="30" value="15" placeholder="Fouls committed">
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <label class="form-label">Home Yellow</label>
+                                <input type="number" class="form-control" name="HY" min="0" max="10" value="2" placeholder="Yellow cards">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Away Yellow</label>
+                                <input type="number" class="form-control" name="AY" min="0" max="10" value="3" placeholder="Yellow cards">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Home Red</label>
+                                <input type="number" class="form-control" name="HR" min="0" max="5" value="0" placeholder="Red cards">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Away Red</label>
+                                <input type="number" class="form-control" name="AR" min="0" max="5" value="0" placeholder="Red cards">
+                            </div>
+                        </div>
+
+                        <!-- Half-Time Data -->
+                        <h6 class="text-warning mb-3"><i class="fas fa-clock me-2"></i>Half-Time Information</h6>
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label">HT Home Goals</label>
+                                <input type="number" class="form-control" name="HTHG" min="0" max="10" value="1" placeholder="Half-time goals">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">HT Away Goals</label>
+                                <input type="number" class="form-control" name="HTAG" min="0" max="10" value="0" placeholder="Half-time goals">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">HT Result</label>
+                                <select class="form-select" name="HTR">
+                                    <option value="H">Home Win</option>
+                                    <option value="D">Draw</option>
+                                    <option value="A">Away Win</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg px-5">
+                                <i class="fas fa-magic me-2"></i>Generate AI Prediction
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="col-lg-6">
+            <div id="predictionResults" class="card shadow-lg" style="display: none;">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>AI Prediction Results</h5>
+                </div>
+                <div class="card-body">
+                    <div id="resultsContent"></div>
+                </div>
+            </div>
+
+            <!-- Quick Tips -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Prediction Tips</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="small mb-0">
+                        <li>Select different home and away teams</li>
+                        <li>Enter realistic match statistics</li>
+                        <li>Include half-time score for better accuracy</li>
+                        <li>Higher shots on target = higher scoring probability</li>
+                        <li>Red cards significantly impact predictions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let predictionChart = null;
+
+document.getElementById('predictionForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const homeTeam = document.getElementById('homeTeam').value;
+    const awayTeam = document.getElementById('awayTeam').value;
+    
+    if (!homeTeam || !awayTeam) {
+        alert('Please select both teams');
+        return;
+    }
+    
+    if (homeTeam === awayTeam) {
+        alert('Please select different teams');
+        return;
+    }
+    
+    try {
+        const formData = new FormData(this);
+        
+        const response = await fetch('/predict', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            displayResults(data);
+        } else {
+            alert('Error: ' + data.error);
+        }
+    } catch (error) {
+        alert('Error making prediction: ' + error.message);
+    }
+});
+
+function displayResults(data) {
+    const resultsDiv = document.getElementById('predictionResults');
+    const contentDiv = document.getElementById('resultsContent');
+    
+    const resultMap = {
+        'H': 'Home Win',
+        'D': 'Draw', 
+        'A': 'Away Win'
+    };
+    
+    const prediction = resultMap[data.prediction] || data.prediction;
+    
+    contentDiv.innerHTML = `
+        <div class="text-center mb-4">
+            <h3 class="text-primary">${data.home_team} vs ${data.away_team}</h3>
+            <div class="alert alert-success">
+                <h4 class="mb-1">
+                    <i class="fas fa-trophy me-2"></i>
+                    Prediction: ${prediction}
+                </h4>
+                <p class="mb-1">Confidence: ${data.confidence}%</p>
+                <p class="mb-0">Predicted Score: ${data.predicted_score}</p>
+            </div>
+        </div>
+        
+        <!-- Pie Chart -->
+        <div class="mb-4">
+            <h6 class="text-center mb-3">Win Probability Distribution</h6>
+            <canvas id="predictionChart" width="400" height="200"></canvas>
+        </div>
+        
+        <!-- Team Statistics Comparison -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h6>${data.home_team} (Home)</h6>
+                        <p class="mb-1"><strong>Points:</strong> ${data.team_stats.home.Points}</p>
+                        <p class="mb-1"><strong>Goals:</strong> ${data.team_stats.home.GoalsFor}/${data.team_stats.home.GoalsAgainst}</p>
+                        <p class="mb-0"><strong>Form:</strong> ${data.team_stats.home.Wins}W-${data.team_stats.home.Draws}D-${data.team_stats.home.Losses}L</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card bg-danger text-white">
+                    <div class="card-body text-center">
+                        <h6>${data.away_team} (Away)</h6>
+                        <p class="mb-1"><strong>Points:</strong> ${data.team_stats.away.Points}</p>
+                        <p class="mb-1"><strong>Goals:</strong> ${data.team_stats.away.GoalsFor}/${data.team_stats.away.GoalsAgainst}</p>
+                        <p class="mb-0"><strong>Form:</strong> ${data.team_stats.away.Wins}W-${data.team_stats.away.Draws}D-${data.team_stats.away.Losses}L</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Match Analysis Details -->
+        <div class="card bg-light">
+            <div class="card-body">
+                <h6 class="text-primary mb-3"><i class="fas fa-chart-line me-2"></i>Match Analysis</h6>
+                <div class="row">
+                    <div class="col-md-6">
+                        <small>
+                            <strong>Total Shots:</strong> ${data.match_analysis.home_shots} - ${data.match_analysis.away_shots}<br>
+                            <strong>On Target:</strong> ${data.match_analysis.home_shots_target} - ${data.match_analysis.away_shots_target}<br>
+                            <strong>Half-Time Score:</strong> ${data.match_analysis.halftime_score}
+                        </small>
+                    </div>
+                    <div class="col-md-6">
+                        <small>
+                            <strong>HT Result:</strong> ${data.match_analysis.halftime_result === 'H' ? 'Home Leading' : data.match_analysis.halftime_result === 'A' ? 'Away Leading' : 'Level'}<br>
+                            <strong>Analysis:</strong> Based on comprehensive match statistics, team form, and historical performance data
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    resultsDiv.style.display = 'block';
+    resultsDiv.scrollIntoView({ behavior: 'smooth' });
+    
+    // Create pie chart
+    createPieChart(data.probabilities, data.home_team, data.away_team);
+}
+
+function createPieChart(probabilities, homeTeam, awayTeam) {
+    const ctx = document.getElementById('predictionChart').getContext('2d');
+    
+    // Destroy existing chart
+    if (predictionChart) {
+        predictionChart.destroy();
+    }
+    
+    predictionChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: [`${homeTeam} Win`, 'Draw', `${awayTeam} Win`],
+            datasets: [{
+                data: [
+                    (probabilities.H * 100).toFixed(1),
+                    (probabilities.D * 100).toFixed(1),
+                    (probabilities.A * 100).toFixed(1)
+                ],
+                backgroundColor: [
+                    '#28a745',  // Green for home
+                    '#ffc107',  // Yellow for draw
+                    '#dc3545'   // Red for away
+                ],
+                borderWidth: 3,
+                borderColor: '#fff',
+                hoverBorderWidth: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.parsed + '%';
+                        }
+                    },
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: '#fff',
+                    borderWidth: 1
+                }
+            },
+            animation: {
+                animateRotate: true,
+                duration: 1000
+            }
+        }
+    });
+}
+</script>
+
+<style>
+#predictionChart {
+    height: 300px !important;
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(45deg, #0056b3, #004085);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+</style>
+{% endblock %}
